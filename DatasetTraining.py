@@ -40,33 +40,23 @@ class DatasetTraining(torch.utils.data.Dataset):
 
 
 
-    #def tokenize(self, train_texts, test_texts):
-    #    train_encodings = tokenizer(train_texts, truncation=True, padding=True)
-
-
-    #def train_model(self):
-    #    model = BertForSequenceClassification.from_pretrained(
-    #        "bert-base-cased",
-    #        num_label=16,
-    #        output_attentions=False,
-    #        output_loading_info=False,
-    #    )
-
-
 
 def data_loader (dataset, max_len, batch_size):
-    training = DatasetTraining (
+    data_set = DatasetTraining (
         tweet=dataset.Tweet.to_numpy,
         sentiment=np.array(dataset[["Emotion", "Intensity"]]),
         max_len=max_len
     )
-    return data.DataLoader(
-        training,
+    return DataLoader(
+        data_set,
         batch_size=batch_size,
         num_workers=4
     )
 
 def train (Dataset):
     dataset_train, dataset_test = train_test_split(Dataset, test_size=0.2)
-    training = data_loader(dataset_train,100,16)
-    testing = data_loader(dataset_test,100,16)
+    train = data_loader(dataset_train,MAX_LEN,BATCH_SIZE)
+    testing = data_loader(dataset_test,MAX_LEN,BATCH_SIZE)
+    data = (iter(train))
+    data.next()
+    print (data.keys())

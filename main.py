@@ -2,10 +2,12 @@ import numpy as np
 import transformers
 import pandas as pd
 import DatasetTraining
-import torch
+
 sentiment = []
 ########################PREPROCESSING AND PREPERATION OF DATA####################################################
 tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
+
+
 def dataset():
     df = pd.read_csv('Dataset.csv')
     return df
@@ -36,9 +38,7 @@ def input_():
         process_text(text)
 
 
-
-dataset()
-
+DatasetTraining.train(dataset())
 #input_()
 
 
