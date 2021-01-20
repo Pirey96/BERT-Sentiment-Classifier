@@ -1,13 +1,14 @@
 import numpy as np
 import transformers
 import pandas as pd
+import DatasetTraining
 import torch
-
+sentiment = []
 ########################PREPROCESSING AND PREPERATION OF DATA####################################################
-tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
 def dataset():
-    df = pd.readcsv()
-
+    df = pd.read_csv('Dataset.csv')
+    return df
 def process_text(text):
     tokens = tokenizer.tokenize(text)
     print ((tokens))
@@ -16,24 +17,28 @@ def process_text(text):
     #special tokens [SEP] 102 [CLS] 101 [PAD] 0
     #encoding behaves like
     encoding = tokenizer.encode_plus(
-        text,
-        max_length=512,
-        add_special_tokens=True,
-        padding='max_length',
-        return_attention_mask=True,
-        truncation=True,
-        return_token_type_ids=False,
+        text,                     #input text
+        max_length=512,           #number of input words
+        add_special_tokens=True,  #CES,CLS,SEP tokens
+        padding='max_length',     #Padding to 512
+        return_attention_mask=True, #attention mask for weights
+        truncation=True,            #truncate to 512
+        return_token_type_ids=False,  #sequence identification
         return_tensors='pt'
     )
-    print(encoding['input_ids'])
-    print(len(encoding['input_ids'][0]))
-
+    #print(encoding['input_ids'])
+    #print(len(encoding['input_ids'][0]))
+    #print(encoding['attention_mask'])
 
 def input_():
     while (1):
         text = input('Input text: ')
         process_text(text)
 
+
+
+dataset()
+
 #input_()
-df = pd.read_csv("Dataset.csv")
-print(df.Intensity)
+
+
