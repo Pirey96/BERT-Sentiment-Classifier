@@ -1,44 +1,36 @@
-import numpy as np
-import transformers
+from torch.utils.data import DataLoader
+from SentimentDataset import SentimentDataset
 import pandas as pd
-import DatasetTraining
+from sklearn.model_selection import train_test_split
+from Input import Input
+BATCH_SIZE = 2
+MAX_LEN = 128
+EPOCHS = 8
 
-sentiment = []
-########################PREPROCESSING AND PREPERATION OF DATA####################################################
-tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
-
-
-def dataset():
+def create_df():
     df = pd.read_csv('Dataset.csv')
     return df
-def process_text(text):
-    tokens = tokenizer.tokenize(text)
-    print ((tokens))
-    token_ids = tokenizer.convert_tokens_to_ids(tokens)
-    print (token_ids)
-    #special tokens [SEP] 102 [CLS] 101 [PAD] 0
-    #encoding behaves like
-    encoding = tokenizer.encode_plus(
-        text,                     #input text
-        max_length=512,           #number of input words
-        add_special_tokens=True,  #CES,CLS,SEP tokens
-        padding='max_length',     #Padding to 512
-        return_attention_mask=True, #attention mask for weights
-        truncation=True,            #truncate to 512
-        return_token_type_ids=False,  #sequence identification
-        return_tensors='pt'
+def create_SentimentDataset(df, max_len):
+    instance = SentimentDataset (df, max_len)
+    return instance
+def create_loader( df, batch_size):
+    return DataLoader(
+        create_SentimentDataset(df, MAX_LEN),
+        batch_size=batch_size,
+        num_workers=4
     )
-    #print(encoding['input_ids'])
-    #print(len(encoding['input_ids'][0]))
-    #print(encoding['attention_mask'])
 
-def input_():
-    while (1):
-        text = input('Input text: ')
-        process_text(text)
+def create_split_dataset(df):
+        dataset_train, dataset_test = train_test_split(df, test_size=0.2)
+        return [dataset_train, dataset_test]
 
 
-DatasetTraining.train(dataset())
-#input_()
+train = create_loader(create_split_dataset(create_df())[0],BATCH_SIZE)
 
-
+##for some reason pytorch and windows causes an error with the sentiment dataset
+if __name__ == '__main__':
+    data = next(iter(train))
+    print (data['emotion'])
+    input_text = Input()
+    encoding = input_text.input_text()
+    #print(encoding)
