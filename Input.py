@@ -20,7 +20,7 @@ class Input():
                 padding='max_length',  # Padding to 512
                 return_attention_mask=True,  # attention mask for weights
                 truncation=True,  # truncate to 512
-                return_token_type_ids=False,  # sequence identification
+                return_token_type_ids=True,  # sequence identification
                 return_tensors='pt'
             )
             return encoding

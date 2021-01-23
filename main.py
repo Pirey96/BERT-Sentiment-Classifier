@@ -3,7 +3,7 @@ from SentimentDataset import SentimentDataset
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from Input import Input
-BATCH_SIZE = 2
+BATCH_SIZE = 1
 MAX_LEN = 128
 EPOCHS = 8
 
@@ -30,7 +30,11 @@ train = create_loader(create_split_dataset(create_df())[0],BATCH_SIZE)
 ##for some reason pytorch and windows causes an error with the sentiment dataset
 if __name__ == '__main__':
     data = next(iter(train))
-    print (data['emotion'])
-    input_text = Input()
-    encoding = input_text.input_text()
+    print (data['input_ids'])
+
+    
+
+    while(1):
+        input_text = Input()
+        encoding = input_text.input_text()
     #print(encoding)
