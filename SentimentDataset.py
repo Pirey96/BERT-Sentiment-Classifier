@@ -7,7 +7,7 @@ tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
 class SentimentDataset():
     def __init__(self, df, max_len):
         self.tweet = df.Tweet.to_numpy()
-        self.emotion = df.Emotions.to_numpy()
+        self.emotion = df.Emotion.to_numpy()
         self.intensity = df.Intensity.to_numpy()
         self.tokenizer = tokenizer
         self.max_len = max_len
@@ -23,7 +23,8 @@ class SentimentDataset():
             add_special_tokens=True,
             padding='max_length',
             return_attention_mask=True,
-            return_token_type_ids=False,
+            truncation=True,
+            return_token_type_ids=True,
             return_tensors='pt'
         )
         return {
@@ -41,4 +42,4 @@ class SentimentDataset():
         elif emotions == 'fear':
             return 3
         else:
-            return 4;
+            return 4
