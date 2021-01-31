@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from torch.cuda import device
 from torch.utils.data import DataLoader
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import AdamW, get_linear_schedule_with_warmup, BertModel
 from SentimentDataset import SentimentDataset
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -75,12 +75,6 @@ def training(dataset_type):
 def Start ():
 ##for some reason pytorch and windows causes an error with the sentiment dataset
     if __name__ == '__main__':
-        #training("anger")
-        data = create_loader(create_df("anger"),BATCH_SIZE)
-        lata = next(iter(data))
-        model = Classifier(len(labels))
-        input_ids = lata['input_ids']
-        print(input_ids.shape)
 
 
         while(1):
@@ -88,4 +82,27 @@ def Start ():
             encoding = input_text.input_text()
             print(encoding)
 
-Start()
+def debug():
+    if __name__ == '__main__':
+        #training("anger")
+        dataloadertrain = create_loader(create_df("anger"),BATCH_SIZE)
+        data = next(iter(dataloadertrain))
+        #lata.pop(1)
+        model_class = Classifier(len(labels))
+
+
+        input_ids=data['input_ids']
+        attention_mask=data['attention_mask']
+        print(input_ids.shape)
+        print(attention_mask.shape)
+        print(type(input_ids))
+        print(model_class(input_ids, attention_mask))
+        training ("anger")
+        while(1):
+            input_text = Input()
+            encoding = input_text.input_text()
+            print(encoding)
+
+
+#Start()
+debug()
