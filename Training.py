@@ -4,9 +4,10 @@ import numpy as np
 
 class Training:
 
-    def __init__(self, model, data_loader, loss_func, optimizer, scheduler, data):
+    def __init__(self, model, data_loader_train, data_loader_test, loss_func, optimizer, scheduler, data):
         self.model = model
-        self.data_loader = data_loader
+        self.data_loader_train = data_loader_train
+        self.data_loader_test = data_loader_test
         self.loss_func = loss_func
         self.optimizer = optimizer
         self.scheduler = scheduler
@@ -16,9 +17,9 @@ class Training:
 
         model = self.model.train()
         loss = []
-        correct_classifications = []
+        correct_classifications = 0
 
-        for datal in self.data_loader:
+        for datal in self.data_loader_train:
             input_ids = datal['input_ids']
             attention_mask = datal['attention_mask']
             # emotion = datal["Emotion"]  # not used because of a design change
@@ -29,8 +30,8 @@ class Training:
             _, pred = torch.max(output, dim=1)
             loss_function = self.loss_func(output, intensity)
             loss.append(loss_function.item())
-
-            loss.backward()
+            correct_classifications = correct_classifications + torch.sum(pred == intensity)
+            loss_function.backward()
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             self.optimizer.step()
             self.scheduler.step()
@@ -44,7 +45,7 @@ class Training:
         correct_classifications = 0
 
         with torch.no_grad():
-            for datal in self.data_loader:
+            for datal in self.data_loader_test:
                 input_ids = datal['input_ids']
                 attention_mask = datal['attention_mask']
                 #emotion = datal["Emotion"]  # not used because of a design change

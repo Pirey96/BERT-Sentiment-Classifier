@@ -15,7 +15,7 @@ from Training import Training
 
 BATCH_SIZE = 16
 MAX_LEN = 150
-EPOCHS = 8
+EPOCHS = 24
 #the possible classification
 labels = [0, 1, 2, 3]
 
@@ -39,21 +39,25 @@ def create_loader( df, batch_size):       ##loading the dataset (transforming th
 def create_split_dataset(df):
     #print(len(df))
     dataset_train, dataset_test = train_test_split(df, test_size=0.2)
-    return [dataset_train, dataset_test]
+    return dataset_train, dataset_test
 
-train_anger = create_loader(create_split_dataset(create_df("anger"))[0], BATCH_SIZE)
-train_joy = create_loader(create_split_dataset(create_df("joy"))[0], BATCH_SIZE)
-train_sadness = create_loader(create_split_dataset(create_df("sadness"))[0], BATCH_SIZE)
-train_fear = create_loader(create_split_dataset(create_df("fear"))[0], BATCH_SIZE)
+#train_anger = create_loader(create_split_dataset(create_df("anger"))[0], BATCH_SIZE)
+#train_joy = create_loader(create_split_dataset(create_df("joy"))[0], BATCH_SIZE)
+#train_sadness = create_loader(create_split_dataset(create_df("sadness"))[0], BATCH_SIZE)
+#train_fear = create_loader(create_split_dataset(create_df("fear"))[0], BATCH_SIZE)
 
 
 def training(dataset_type):
     model = Classifier(len(labels))
     ##model = model.to(device)    ##!!!!!NOT WORKING
     ########################################training the anger model
-    optimizer = AdamW(model.parameters(), lr=2e-5,
+    optimizer = AdamW(model.parameters(),
+                      lr=2e-5,
                       correct_bias=False)  # optimizer as per the bert paper (may be more calibrated)
-    total_training_steps = len(create_df(dataset_type)) * EPOCHS  # length of total training data loader
+    df = create_df(dataset_type)
+    df_train_set, df_test_set = create_split_dataset(df)
+
+    total_training_steps = len(df_test_set) * EPOCHS  # length of total training data loader
     loss_funct = nn.CrossEntropyLoss()
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
@@ -62,12 +66,19 @@ def training(dataset_type):
     )
     trained_models = defaultdict(list)
     accuracy = 0
-    training = Training(model, create_loader(create_df(dataset_type), BATCH_SIZE), loss_funct, optimizer, scheduler, len(create_df(dataset_type)))
+    training = Training(model, create_loader(df_train_set,
+                        BATCH_SIZE),create_loader(df_test_set, BATCH_SIZE),
+                        loss_funct,
+                        optimizer,
+                        scheduler,
+                        len(create_df(dataset_type))
+                        )
     for epochs in range(EPOCHS):
         print(f'Epoch {epochs+1}/{EPOCHS}')
         print ('-'*10)
-        #train_accuracy, train_loss = training.training_model()
-        #print (f'Train loss {train_loss} accuracy {train_accuracy}')
+        train_accuracy, train_loss = training.training_model()
+        print (f'Train loss {train_loss} accuracy {train_accuracy}')
+
         val_acc, val_loss = training.evaluate()
         print (f'val loss {val_loss} accuracy {val_acc}')
 
@@ -75,7 +86,7 @@ def training(dataset_type):
 def Start ():
 ##for some reason pytorch and windows causes an error with the sentiment dataset
     if __name__ == '__main__':
-
+        training("anger")
 
         while(1):
             input_text = Input()
@@ -104,5 +115,5 @@ def debug():
             print(encoding)
 
 
-#Start()
-debug()
+Start()
+#debug()
