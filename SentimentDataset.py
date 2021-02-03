@@ -2,14 +2,14 @@ import torch
 import transformers
 
 #define the tokenizer
-tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
+
 
 class SentimentDataset():
     def __init__(self, df, max_len):
         self.tweet = df.Tweet.to_numpy()
         self.emotion = df.Emotion.to_numpy()
         self.intensity = df.Intensity.to_numpy()
-        self.tokenizer = tokenizer
+        self.tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-uncased')
         self.max_len = max_len
 
     def __len__(self):
@@ -17,7 +17,7 @@ class SentimentDataset():
 
     def __getitem__(self, item):
         tweet_item = str(self.tweet[item])
-        encoding = tokenizer.encode_plus(
+        encoding = self.tokenizer.encode_plus(
             tweet_item,
             max_length=self.max_len,
             add_special_tokens=True,

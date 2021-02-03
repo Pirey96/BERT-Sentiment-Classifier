@@ -25,9 +25,11 @@ class Training:
             # emotion = datal["Emotion"]  # not used because of a design change
             intensity = datal["intensity"]
 
-            output = model(input_ids=input_ids, attention_mask=attention_mask)
+            print(datal["intensity"])
 
+            output = model(input_ids=input_ids, attention_mask=attention_mask)
             _, pred = torch.max(output, dim=1)
+            print(f'answer: {pred}')
             loss_function = self.loss_func(output, intensity)
             loss.append(loss_function.item())
             correct_classifications = correct_classifications + torch.sum(pred == intensity)
@@ -36,7 +38,7 @@ class Training:
             self.optimizer.step()
             self.scheduler.step()
             self.optimizer.zero_grad()
-            return correct_classifications.double() / self.data, np.mean(loss)
+        return correct_classifications.double() / self.data, np.mean(loss)
 
 
     def evaluate(self):
@@ -57,8 +59,8 @@ class Training:
                 loss_function = self.loss_func(output, intensity)
                 loss.append(loss_function.item())
                 correct_classifications = correct_classifications + torch.sum(pred == intensity)
-
-                return correct_classifications.double() / self.data, np.mean(loss)
+                print(torch.sum(pred==intensity))
+        return correct_classifications.double() / self.data, np.mean(loss)
 
 
 

@@ -1,11 +1,12 @@
 from torch import nn
-from transformers import BertModel
+from transformers import BertModel, BertForSequenceClassification
+
 
 class Classifier (nn.Module):
     def __init__(self, emotion_intensity):
         super(Classifier, self).__init__()
-        self.bert_model = BertModel.from_pretrained('bert-base-cased')  #import the bert model of cased datasets
-        self.drop = nn.Dropout(p=0.6)    #dropout probabilties
+        self.bert_model = BertModel.from_pretrained('bert-base-uncased')  #import the bert model of cased datasets
+        self.drop = nn.Dropout(p=0.3)    #dropout probabilties
         self.out = nn.Linear(self.bert_model.config.hidden_size, emotion_intensity)  #linear
         self.softmax = nn.Softmax(dim=1)    #normalize the tensors
 
