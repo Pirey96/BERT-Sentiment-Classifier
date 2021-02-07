@@ -11,9 +11,15 @@ from Classifier import Classifier
 from Training import Training
 
 
+
+import torch.cuda
+import tensorflow as tf
+torch.cuda.is_available()
+tf.config.experimental.list_physical_devices('GPU')
+device = torch.device("cuda")
 BATCH_SIZE = 32
 MAX_LEN = 170
-EPOCHS = 1
+EPOCHS = 10
 #the possible classification
 labels = [0, 1, 2, 3]
 
@@ -61,7 +67,7 @@ def create_split_dataset(df):
 
 def training(dataset_type):
     model = Classifier(len(labels))
-    ##model = model.to(device)    ##!!!!!NOT WORKING
+    #model = model.to(device)    ##!!!!!NOT WORKING
     ########################################training the anger model
     optimizer = AdamW(model.parameters(),
                       lr=1e-5)  # optimizer as per the bert paper (may be more calibrated)
@@ -83,7 +89,8 @@ def training(dataset_type):
                         loss_funct,
                         optimizer,
                         scheduler,
-                        len(df_train_set)
+                        len(df_train_set),
+                        len(df_test_set)
                         )
 
     for epochs in range(EPOCHS):
@@ -92,8 +99,8 @@ def training(dataset_type):
         train_accuracy, train_loss = training.training_model()
         print (f'Train loss {train_loss} accuracy {train_accuracy}')
 
-        val_acc, val_loss = training.evaluate()
-        print (f'val loss {val_loss} accuracy {val_acc}')
+        test_acc, test_loss = training.testing_model()
+        print (f'test loss {test_loss} accuracy {test_acc}')
 
 
 def Start ():
