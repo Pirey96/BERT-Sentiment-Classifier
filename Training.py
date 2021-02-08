@@ -14,17 +14,18 @@ class Training:
         self.data_train = data_train
         self.data_test = data_test
 
-    def training_model(self):
+
+    def training_model(self, device):
 
         model = self.model.train()
         loss = []
         correct_classifications = 0
 
         for datal in self.data_loader_train:
-            input_ids = datal['input_ids']
-            attention_mask = datal['attention_mask']
+            input_ids = datal['input_ids'].to(device)
+            attention_mask = datal['attention_mask'].to(device)
             # emotion = datal["Emotion"]  # not used because of a design change
-            intensity = datal["intensity"]
+            intensity = datal["intensity"].to(device)
 
             print(datal["intensity"])
 
@@ -42,17 +43,17 @@ class Training:
         return correct_classifications.double() / self.data_train, np.mean(loss)
 
 
-    def testing_model(self):
+    def testing_model(self, device):
         model = self.model.eval()
         loss = []
         correct_classifications = 0
 
         with torch.no_grad():
             for datal in self.data_loader_test:
-                input_ids = datal['input_ids']
-                attention_mask = datal['attention_mask']
+                input_ids = datal['input_ids'].to(device)
+                attention_mask = datal['attention_mask'].to(device)
                 #emotion = datal["Emotion"]  # not used because of a design change
-                intensity = datal["intensity"]
+                intensity = datal["intensity"].to(device)
 
                 output = model(input_ids=input_ids, attention_mask=attention_mask)
 

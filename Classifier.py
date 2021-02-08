@@ -16,4 +16,4 @@ class Classifier (nn.Module):
             attention_mask=attention_mask
         )
         output = self.drop(pooled_output)
-        return self.softmax(self.out(output))
+        return (self.out(output))

@@ -11,13 +11,17 @@ from Classifier import Classifier
 from Training import Training
 
 
-
+###GPU SETUP###
 import torch.cuda
 import tensorflow as tf
 torch.cuda.is_available()
 tf.config.experimental.list_physical_devices('GPU')
 device = torch.device("cuda")
-BATCH_SIZE = 32
+torch.cuda.empty_cache()
+
+###GPU SETUP END###
+
+BATCH_SIZE = 16
 MAX_LEN = 170
 EPOCHS = 10
 #the possible classification
@@ -67,7 +71,7 @@ def create_split_dataset(df):
 
 def training(dataset_type):
     model = Classifier(len(labels))
-    #model = model.to(device)    ##!!!!!NOT WORKING
+    model = model.to(device)    ##!!!!!NOT WORKING
     ########################################training the anger model
     optimizer = AdamW(model.parameters(),
                       lr=1e-5)  # optimizer as per the bert paper (may be more calibrated)
@@ -75,7 +79,7 @@ def training(dataset_type):
     df_train_set, df_test_set = create_split_dataset(df)
 
     total_training_steps = len(df_test_set) * EPOCHS  # length of total training data loader
-    loss_funct = nn.CrossEntropyLoss()
+    loss_funct = nn.CrossEntropyLoss().to(device)
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
         num_warmup_steps=0,
@@ -90,16 +94,16 @@ def training(dataset_type):
                         optimizer,
                         scheduler,
                         len(df_train_set),
-                        len(df_test_set)
+                        len(df_test_set),
                         )
 
     for epochs in range(EPOCHS):
         print(f'Epoch {epochs+1}/{EPOCHS}')
         print ('-'*100)
-        train_accuracy, train_loss = training.training_model()
+        train_accuracy, train_loss = training.training_model(device)
         print (f'Train loss {train_loss} accuracy {train_accuracy}')
 
-        test_acc, test_loss = training.testing_model()
+        test_acc, test_loss = training.testing_model(device)
         print (f'test loss {test_loss} accuracy {test_acc}')
 
 
