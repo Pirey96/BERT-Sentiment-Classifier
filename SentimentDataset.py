@@ -30,6 +30,7 @@ class SentimentDataset():
         return {
             'input_ids': encoding['input_ids'].flatten(),
             'attention_mask': encoding['attention_mask'].flatten(),
+            'token_type_ids': encoding['token_type_ids'].flatten(),
             'emotion': torch.tensor(self.string_to_num(self.emotion[item]), dtype=torch.long),
             'intensity': torch.tensor(self.intensity[item], dtype=torch.long)
         }

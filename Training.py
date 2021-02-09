@@ -30,11 +30,11 @@ class Training:
             print(datal["intensity"])
 
             output = model(input_ids=input_ids, attention_mask=attention_mask)
-            _, pred = torch.max(output, dim=1)
-            print(f'answer: {pred}')
+            _, prediction = torch.max(output, dim=1)
+            print(prediction)
             loss_function = self.loss_func(output, intensity)
             loss.append(loss_function.item())
-            correct_classifications = correct_classifications + torch.sum(pred == intensity)
+            correct_classifications = correct_classifications + torch.sum(prediction == intensity)
             loss_function.backward()
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             self.optimizer.step()
@@ -57,11 +57,12 @@ class Training:
 
                 output = model(input_ids=input_ids, attention_mask=attention_mask)
 
-                _,pred = torch.max(output, dim=1)
+                _,prediction = torch.max(output, dim=1)
                 loss_function = self.loss_func(output, intensity)
                 loss.append(loss_function.item())
-                correct_classifications = correct_classifications + torch.sum(pred == intensity)
-                print(torch.sum(pred==intensity))
+                correct_classifications = correct_classifications + torch.sum(prediction == intensity)
+                print(datal["intensity"])
+                print(prediction)
         return correct_classifications.double() / self.data_test, np.mean(loss)
 
 
