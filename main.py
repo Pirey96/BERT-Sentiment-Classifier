@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from Input import Input
 from Classifier import Classifier
 from Training import Training
+from sklearn.utils import shuffle
 
 
 ###GPU SETUP###
@@ -75,9 +76,10 @@ def training(dataset_type):
     ########################################training the anger model
     optimizer = AdamW(model.parameters(),
                       lr=1e-5)  # optimizer as per the bert paper (may be more calibrated)
+    df = create_df(dataset_type)
+    df_train_set, df_test_set = create_split_dataset(df)
 
-    train, test = create_split_dataset(create_df(dataset_type))
-    total_training_steps = len(test) * EPOCHS  # length of total training data loader
+    total_training_steps = len(df_test_set) * EPOCHS  # length of total training data loader
     loss_funct = nn.CrossEntropyLoss().to(device)
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
@@ -89,8 +91,7 @@ def training(dataset_type):
 
 
     for epochs in range(EPOCHS):
-        df = create_df(dataset_type)
-        df_train_set, df_test_set = create_split_dataset(df)
+        df_train_set = shuffle(df_train_set)
         training = Training(model,
                             create_loader(df_train_set, BATCH_SIZE),
                             create_loader(df_test_set, BATCH_SIZE),
