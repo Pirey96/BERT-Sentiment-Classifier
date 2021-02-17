@@ -12,7 +12,7 @@ from Training import Training
 from sklearn.utils import shuffle
 
 
-###GPU SETUP###
+# # # GPU SETUP # # #
 import torch.cuda
 import tensorflow as tf
 torch.cuda.is_available()
@@ -20,12 +20,12 @@ tf.config.experimental.list_physical_devices('GPU')
 device = torch.device("cuda")
 torch.cuda.empty_cache()
 
-###GPU SETUP END###
+# # # GPU SETUP END # # #
 
-BATCH_SIZE = 16
+BATCH_SIZE = 4
 MAX_LEN = 170
-EPOCHS = 10
-#the possible classification
+EPOCHS = 8
+# the possible classification
 labels = [0, 1, 2, 3]
 
 def format_df(df):
@@ -55,7 +55,8 @@ def create_SentimentDataset(df, max_len):
     instance = SentimentDataset (df, max_len)
     return instance
 
-def create_loader( df, batch_size):       ##loading the dataset (transforming them at the same time)
+def create_loader( df, batch_size):
+    # # loading the dataset (transforming them at the same time)
     #print (f'Tweet num: {df["Unnamed: 0"]} Intensity {df["Intensity"]} ')
     return DataLoader(
         create_SentimentDataset(df, MAX_LEN),
@@ -72,8 +73,8 @@ def create_split_dataset(df):
 
 def training(dataset_type):
     model = Classifier(len(labels))
-    model = model.to(device)    ##!!!!!NOT WORKING
-    ########################################training the anger model
+    model = model.to(device)    # #!!!!!NOT WORKING
+    # #######################################training the anger model
     optimizer = AdamW(model.parameters(),
                       lr=1e-5)  # optimizer as per the bert paper (may be more calibrated)
     df = create_df(dataset_type)
@@ -91,7 +92,7 @@ def training(dataset_type):
 
 
     for epochs in range(EPOCHS):
-        df_train_set = shuffle(df_train_set)
+        #df_train_set = shuffle(df_train_set)
         training = Training(model,
                             create_loader(df_train_set, BATCH_SIZE),
                             create_loader(df_test_set, BATCH_SIZE),
@@ -104,16 +105,17 @@ def training(dataset_type):
         print(f'Epoch {epochs+1}/{EPOCHS}')
         print ('-'*100)
         train_accuracy, train_loss = training.training_model(device)
-        print (f'Train loss {train_loss} accuracy {train_accuracy}')
+        print (f'Train loss {train_loss} f1-Score {train_accuracy}')
 
         test_acc, test_loss = training.testing_model(device)
-        print (f'test loss {test_loss} accuracy {test_acc}')
+        print (f'test loss {test_loss} f1-Score {test_acc}')
 
 
 def Start ():
-##for some reason pytorch and windows causes an error with the sentiment dataset
+# #for some reason pytorch and windows causes an error with the sentiment dataset
     if __name__ == '__main__':
-        training("anger")
+        training("joy")
+
 
         while(1):
             input_text = Input()
@@ -133,10 +135,11 @@ Start()
 
 
 
-##RESERVED FOR DEBUG PURPOSES
+# # RESERVED FOR DEBUG PURPOSES
 def debug():
     if __name__ == '__main__':
         df = create_df("anger")
+
         print(len(create_loader(df, BATCH_SIZE)))
 
 

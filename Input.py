@@ -9,8 +9,8 @@ class Input():
     def tokenize_input(self, text):
             tokens = tokenizer.tokenize(text)
             #print(tokens)
-            #token_ids = tokenizer.convert_tokens_to_ids(tokens)
-            #print(token_ids)
+            # token_ids = tokenizer.convert_tokens_to_ids(tokens)
+            # print(token_ids)
             # special tokens [SEP] 102 [CLS] 101 [PAD] 0
             # encoding behaves like
             encoding = tokenizer.encode_plus(
