@@ -1,16 +1,13 @@
 import transformers
-tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
+from Predict import Predict
+tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-uncased')
 
 class Input():
     def input_text (self):
         text = input("Input text: ")
-        return self.tokenize_input( text)
+        return self.tokenize_input(text)
 
     def tokenize_input(self, text):
-            tokens = tokenizer.tokenize(text)
-            #print(tokens)
-            # token_ids = tokenizer.convert_tokens_to_ids(tokens)
-            # print(token_ids)
             # special tokens [SEP] 102 [CLS] 101 [PAD] 0
             # encoding behaves like
             encoding = tokenizer.encode_plus(
@@ -23,4 +20,10 @@ class Input():
                 return_token_type_ids=True,  # sequence identification
                 return_tensors='pt'
             )
-            return encoding['input_ids']
+            self.classifier(encoding)
+            return encoding
+
+
+
+    def classifier(self, encoding):
+        Predict(encoding, "fear", "joy", "sadness", "anger")

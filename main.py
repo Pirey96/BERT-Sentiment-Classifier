@@ -9,16 +9,18 @@ from sklearn.model_selection import train_test_split
 from Input import Input
 from Classifier import Classifier
 from Training import Training
-from sklearn.utils import shuffle
+import joblib
 
 
 # # # GPU SETUP # # #
 import torch.cuda
-import tensorflow as tf
-torch.cuda.is_available()
-tf.config.experimental.list_physical_devices('GPU')
+#import tensorflow as tf
+print(torch.cuda.is_available())
+print(torch.version.cuda)
+print(torch.__version__)
+#tf.config.experimental.list_physical_devices('GPU')
 device = torch.device("cuda")
-torch.cuda.empty_cache()
+#torch.cuda.empty_cache()
 
 # # # GPU SETUP END # # #
 
@@ -88,9 +90,7 @@ def training(dataset_type):
         num_training_steps=total_training_steps
     )
     trained_models = defaultdict(list)
-    accuracy = 0
-
-
+    f1_score = 0.0
     for epochs in range(EPOCHS):
         #df_train_set = shuffle(df_train_set)
         training = Training(model,
@@ -103,24 +103,44 @@ def training(dataset_type):
                             len(df_test_set),
                             )
         print(f'Epoch {epochs+1}/{EPOCHS}')
-        print ('-'*100)
-        train_accuracy, train_loss = training.training_model(device)
-        print (f'Train loss {train_loss} f1-Score {train_accuracy}')
+        print('-'*100)
+        train_f1, train_loss = training.training_model(device)
+        print(f'Train loss {train_loss} f1-Score {train_f1}')
 
-        test_acc, test_loss = training.testing_model(device)
-        print (f'test loss {test_loss} f1-Score {test_acc}')
+        test_f1, test_loss = training.testing_model(device)
+        print(f'test loss {test_loss} f1-Score {test_f1}')
+        trained_models['f1-score'].append(test_f1)
+
+
+
+         #Saving the best Models
+        if test_f1 > f1_score:
+            f1_score = test_f1  #new best
+            SAVEFILE = dataset_type +".bin"
+            torch.save(model.state_dict(), SAVEFILE)    # saving the model in a .bin file
+            print(f'NEW SAVE AT EPOCH: {epochs+1} at FILE: {SAVEFILE}')
+
+
+        # Exporting the best model to a binary file
+
+
+
 
 
 def Start ():
 # #for some reason pytorch and windows causes an error with the sentiment dataset
     if __name__ == '__main__':
-        training("joy")
+        #training('joy')       # --DONE TRAINING
+        #training('anger')     # --DONE TRAINING
+        #training('fear')      # --DONE TRAINING
+        #training('sadness')   # --DONE TRAINING
+
 
 
         while(1):
             input_text = Input()
-            encoding = input_text.input_text()
-            print(encoding)
+            input_text.input_text()
+
 
 
 Start()

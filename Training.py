@@ -94,14 +94,14 @@ class Training:
             loss_function = self.loss_func(output, intensity)
             loss.append(loss_function.item())
 
-            # correct_classifications = f1_score(actual,pred,average='micro')
+            # correct_classifications = f1_score(actual, pred, average='micro')
             loss_function.backward()
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             self.optimizer.step()
             self.scheduler.step()
             self.optimizer.zero_grad()
 
-        self.confusion_matrix(actual, pred)
+        #self.confusion_matrix(actual, pred)
         print(f'The custom f1-score {self.alternate_f1(actual, pred)}')
         return f1_score(self.flatten(actual), self.flatten(pred), average='macro'), np.mean(loss)
 
@@ -128,10 +128,7 @@ class Training:
                 actual.append(datal["intensity"].numpy())
                 print(datal["intensity"])
                 print(prediction)
-        self.confusion_matrix(actual,pred)
-        zero, three = self.euclide (actual)
-        dist_den = numpy.linalg.norm(numpy.array(zero) - numpy.array(three))
-        dist = numpy.linalg.norm(numpy.array(actual) - numpy.array(pred))
+        self.confusion_matrix(actual, pred)
         print(f'The custom f1-score {self.alternate_f1(actual, pred)}')
         return f1_score(self.flatten(actual), self.flatten(pred), average='macro'), np.mean(loss)
 

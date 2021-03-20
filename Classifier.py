@@ -15,5 +15,6 @@ class Classifier (nn.Module):
             input_ids=input_ids,
             attention_mask=attention_mask
         )
+
         output = self.drop(pooled_output)
         return self.out(output)
